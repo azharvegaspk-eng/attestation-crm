@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { api } from '../lib/api';
+import { getCurrentUser } from '../lib/auth';
 
 export default function PaymentForm({ initial, onSaved, onCancel }) {
   const [clients, setClients] = useState([]);
@@ -37,8 +38,10 @@ export default function PaymentForm({ initial, onSaved, onCancel }) {
     if (!form.Client_or_Vendor) return toast.error('Select a client or vendor');
     setSaving(true);
     try {
-      if (initial?.Payment_ID) { await api.updatePayment(form); toast.success('Payment updated'); }
-      else { await api.addPayment(form); toast.success('Payment recorded'); }
+      const user = getCurrentUser();
+      const payload = { ...form, Added_By: initial?.Added_By || user?.fullName || '' };
+      if (initial?.Payment_ID) { await api.updatePayment(payload); toast.success('Payment updated'); }
+      else { await api.addPayment(payload); toast.success('Payment recorded'); }
       onSaved && onSaved();
     } catch (e) { toast.error(e.message); } finally { setSaving(false); }
   }

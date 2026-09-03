@@ -3,14 +3,24 @@
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { api } from '../lib/api';
+import { getCurrentUser, logout } from '../lib/auth';
 
 export default function Topbar({ onQuickAdd }) {
   const [q, setQ] = useState('');
   const [results, setResults] = useState(null);
   const [open, setOpen] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
+  const [userOpen, setUserOpen] = useState(false);
+  const [user, setUser] = useState(null);
   const boxRef = useRef(null);
   const router = useRouter();
+
+  useEffect(() => { setUser(getCurrentUser()); }, []);
+
+  function doLogout() {
+    logout();
+    router.push('/login');
+  }
 
   useEffect(() => {
     function onClick(e) {
@@ -81,7 +91,24 @@ export default function Topbar({ onQuickAdd }) {
       </div>
 
       <button className="btn-ghost" title="Notifications">🔔</button>
-      <div className="w-9 h-9 rounded-full bg-brand-600 text-white flex items-center justify-center text-sm font-semibold">A</div>
+
+      <div className="relative">
+        <button onClick={() => setUserOpen((v) => !v)} className="flex items-center gap-2">
+          <div className="w-9 h-9 rounded-full bg-brand-600 text-white flex items-center justify-center text-sm font-semibold">
+            {(user?.fullName || '?').charAt(0)}
+          </div>
+        </button>
+        {userOpen && (
+          <div className="absolute right-0 mt-2 w-52 bg-white rounded-xl shadow-lg border border-slate-100 py-2 z-30">
+            <div className="px-4 py-1.5">
+              <div className="text-sm font-semibold text-slate-800">{user?.fullName || 'Guest'}</div>
+              <div className="text-xs text-slate-400 capitalize">{user?.role || ''}</div>
+            </div>
+            <div className="border-t border-slate-100 my-1" />
+            <button onClick={doLogout} className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-slate-50">Logout</button>
+          </div>
+        )}
+      </div>
     </header>
   );
 }

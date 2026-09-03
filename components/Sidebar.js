@@ -10,6 +10,7 @@ const NAV = [
   { href: '/add', label: 'Add New Entry', icon: '➕' },
   { href: '/vendors', label: 'Vendors', icon: '🏢' },
   { href: '/payments', label: 'Payments', icon: '💰' },
+  { href: '/ledger', label: 'Ledger', icon: '📒' },
   { href: '/reports', label: 'Reports', icon: '📊' },
   { href: '/settings', label: 'Settings', icon: '⚙️' },
 ];
@@ -18,9 +19,13 @@ export default function Sidebar() {
   const pathname = usePathname();
   return (
     <aside className="w-64 shrink-0 bg-slate-900 text-slate-200 flex flex-col">
-      <div className="px-5 py-5 border-b border-slate-800">
-        <div className="text-lg font-bold text-white">Attestation CRM</div>
-        <div className="text-xs text-slate-400">Client & Document Manager</div>
+      <div className="px-5 py-5 border-b border-slate-800 flex items-center gap-3">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/logo.png" alt="Avenza Consultancy" className="h-9 w-auto object-contain" />
+        <div>
+          <div className="text-sm font-bold text-white leading-tight">Avenza Consultancy</div>
+          <div className="text-xs text-slate-400 leading-tight">CRM</div>
+        </div>
       </div>
       <nav className="flex-1 py-3 space-y-0.5 px-2">
         {NAV.map((item) => {

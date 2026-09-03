@@ -2,7 +2,7 @@ import './globals.css';
 import Shell from '../components/Shell';
 
 export const metadata = {
-  title: 'Attestation CRM',
+  title: 'Avenza Consultancy CRM',
   description: 'Client, case, vendor & payment management',
 };
 

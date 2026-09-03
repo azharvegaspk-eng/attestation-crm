@@ -5,7 +5,7 @@ import toast from 'react-hot-toast';
 import { api } from '../lib/api';
 
 export default function ClientForm({ initial, onSaved, onCancel }) {
-  const [form, setForm] = useState({ Client_Name: '', Phone: '', Email: '', Company: '', Address: '', Notes: '', Status: 'Active', ...initial });
+  const [form, setForm] = useState({ Client_Name: '', Phone: '', Email: '', Company: '', Address: '', Notes: '', Status: 'Active', Client_Type: 'Walk-in', ...initial });
   const [saving, setSaving] = useState(false);
   function set(k, v) { setForm((f) => ({ ...f, [k]: v })); }
 
@@ -34,6 +34,14 @@ export default function ClientForm({ initial, onSaved, onCancel }) {
       <div>
         <label className="label">Client Name</label>
         <input className="input" value={form.Client_Name} onChange={(e) => set('Client_Name', e.target.value)} required />
+      </div>
+      <div>
+        <label className="label">Client Type</label>
+        <select className="input" value={form.Client_Type} onChange={(e) => set('Client_Type', e.target.value)}>
+          <option value="Walk-in">Walk-in</option>
+          <option value="Consultant">Consultant</option>
+        </select>
+        <p className="text-xs text-slate-400 mt-1">Consultant = someone we take work from (as our client); Walk-in = a regular direct client.</p>
       </div>
       <div className="grid grid-cols-2 gap-4">
         <div>

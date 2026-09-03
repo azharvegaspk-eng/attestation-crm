@@ -11,16 +11,17 @@ import ClientForm from '../../components/ClientForm';
 export default function ClientsPage() {
   const [clients, setClients] = useState([]);
   const [q, setQ] = useState('');
+  const [clientType, setClientType] = useState('');
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(null); // client obj or 'new'
   const [deleting, setDeleting] = useState(null);
 
   function load() {
     setLoading(true);
-    api.getClients(q).then(setClients).catch((e) => toast.error(e.message)).finally(() => setLoading(false));
+    api.getClients(q, clientType).then(setClients).catch((e) => toast.error(e.message)).finally(() => setLoading(false));
   }
 
-  useEffect(() => { const t = setTimeout(load, 200); return () => clearTimeout(t); }, [q]);
+  useEffect(() => { const t = setTimeout(load, 200); return () => clearTimeout(t); }, [q, clientType]);
 
   async function doDelete() {
     try {
@@ -42,18 +43,28 @@ export default function ClientsPage() {
       </div>
 
       <div className="card">
-        <input className="input max-w-sm mb-4" placeholder="Search by name, phone, email, company…" value={q} onChange={(e) => setQ(e.target.value)} />
+        <div className="flex gap-3 mb-4">
+          <input className="input max-w-sm" placeholder="Search by name, phone, email, company…" value={q} onChange={(e) => setQ(e.target.value)} />
+          <select className="input max-w-xs" value={clientType} onChange={(e) => setClientType(e.target.value)}>
+            <option value="">All types</option>
+            <option value="Walk-in">Walk-in</option>
+            <option value="Consultant">Consultant</option>
+          </select>
+        </div>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead><tr className="border-b border-slate-100">
-              {['Client Name', 'Phone', 'Email', 'Company', 'Total Cases', 'Total Paid', 'Pending', 'Last Activity', 'Actions'].map((h) => <th key={h} className="th">{h}</th>)}
+              {['Client Name', 'Type', 'Phone', 'Email', 'Company', 'Total Cases', 'Total Paid', 'Pending', 'Last Activity', 'Actions'].map((h) => <th key={h} className="th">{h}</th>)}
             </tr></thead>
             <tbody>
-              {loading && <tr><td colSpan={9} className="td text-center text-slate-400 py-8">Loading…</td></tr>}
-              {!loading && clients.length === 0 && <tr><td colSpan={9} className="td text-center text-slate-400 py-8">No clients yet</td></tr>}
+              {loading && <tr><td colSpan={10} className="td text-center text-slate-400 py-8">Loading…</td></tr>}
+              {!loading && clients.length === 0 && <tr><td colSpan={10} className="td text-center text-slate-400 py-8">No clients yet</td></tr>}
               {clients.map((c) => (
                 <tr key={c.Client_ID} className="border-b border-slate-50 hover:bg-slate-50">
                   <td className="td"><Link href={`/clients/${c.Client_ID}`} className="font-medium text-brand-700 hover:underline">{c.Client_Name}</Link></td>
+                  <td className="td">
+                    <span className={`badge ${c.Client_Type === 'Consultant' ? 'bg-purple-100 text-purple-700' : 'bg-slate-100 text-slate-700'}`}>{c.Client_Type || 'Walk-in'}</span>
+                  </td>
                   <td className="td">{c.Phone}</td>
                   <td className="td">{c.Email}</td>
                   <td className="td">{c.Company}</td>

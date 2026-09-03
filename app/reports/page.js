@@ -22,7 +22,7 @@ const PRESETS = {
 
 export default function ReportsPage() {
   const [preset, setPreset] = useState('Monthly');
-  const [filters, setFilters] = useState({ ...PRESETS.Monthly(), client: '', vendor: '', service: '', status: '' });
+  const [filters, setFilters] = useState({ ...PRESETS.Monthly(), client: '', vendor: '', service: '', status: '', clientType: '' });
   const [report, setReport] = useState(null);
 
   useEffect(() => { load(); }, [filters]);
@@ -73,6 +73,11 @@ export default function ReportsPage() {
         <input className="input" placeholder="Vendor" value={filters.vendor} onChange={(e) => setFilter('vendor', e.target.value)} />
         <input className="input" placeholder="Service" value={filters.service} onChange={(e) => setFilter('service', e.target.value)} />
         <input className="input" placeholder="Status" value={filters.status} onChange={(e) => setFilter('status', e.target.value)} />
+        <select className="input" value={filters.clientType} onChange={(e) => setFilter('clientType', e.target.value)}>
+          <option value="">All client types</option>
+          <option value="Walk-in">Walk-in</option>
+          <option value="Consultant">Consultant</option>
+        </select>
       </div>
 
       {report && (
@@ -87,6 +92,27 @@ export default function ReportsPage() {
             <StatCard label="Pending Client Payments" value={money(report.summary.pendingClientPayments)} icon="⚠️" tone="red" />
             <StatCard label="Pending Vendor Payments" value={money(report.summary.pendingVendorPayments)} icon="⚠️" tone="red" />
           </div>
+
+          {report.consultantBreakdown && report.consultantBreakdown.length > 0 && (
+            <div className="card overflow-x-auto">
+              <h3 className="font-semibold text-slate-700 mb-3">Consultant-wise Breakdown</h3>
+              <table className="w-full">
+                <thead><tr className="border-b border-slate-100">
+                  {['Consultant', 'Cases', 'Total Client Payment', 'Total Profit'].map((h) => <th key={h} className="th">{h}</th>)}
+                </tr></thead>
+                <tbody>
+                  {report.consultantBreakdown.map((c) => (
+                    <tr key={c.consultant} className="border-b border-slate-50">
+                      <td className="td font-medium">{c.consultant}</td>
+                      <td className="td">{c.caseCount}</td>
+                      <td className="td">{money(c.totalClientPayment)}</td>
+                      <td className="td text-emerald-600 font-semibold">{money(c.totalProfit)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
 
           <div className="card overflow-x-auto">
             <table className="w-full">

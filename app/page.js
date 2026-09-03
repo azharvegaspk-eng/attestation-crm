@@ -7,15 +7,27 @@ import { money, fmtDate } from '../lib/utils';
 import StatCard from '../components/StatCard';
 import StatusBadge from '../components/StatusBadge';
 import toast from 'react-hot-toast';
+import { getCurrentUser, isAdmin } from '../lib/auth';
 
 const COLORS = ['#3179ff', '#22c55e', '#f59e0b', '#a855f7', '#ef4444', '#14b8a6', '#64748b', '#eab308'];
 
 export default function DashboardPage() {
   const [data, setData] = useState(null);
+  const [user, setUser] = useState(null);
+  const [teamUsers, setTeamUsers] = useState([]);
+  const [scope, setScope] = useState(''); // '' = everyone (admin only)
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    const u = getCurrentUser();
+    setUser(u);
+    if (isAdmin(u)) api.getUsers().then(setTeamUsers).catch(() => {});
+  }, []);
+
+  useEffect(() => { if (user) load(); }, [user, scope]);
+
   function load() {
-    api.getDashboard().then(setData).catch((e) => toast.error(e.message));
+    const addedBy = isAdmin(user) ? (scope || undefined) : user.fullName;
+    api.getDashboard({ addedBy }).then(setData).catch((e) => toast.error(e.message));
   }
 
   if (!data) return <Loading />;
@@ -23,9 +35,19 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-xl font-bold text-slate-800">Dashboard</h1>
-        <p className="text-sm text-slate-500">Live overview synced from Google Sheets</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-xl font-bold text-slate-800">Dashboard</h1>
+          <p className="text-sm text-slate-500">
+            {isAdmin(user) ? 'Live overview synced from Google Sheets' : `Your entries — ${user?.fullName}`}
+          </p>
+        </div>
+        {isAdmin(user) && (
+          <select className="input max-w-xs" value={scope} onChange={(e) => setScope(e.target.value)}>
+            <option value="">Everyone (Admin view)</option>
+            {teamUsers.map((u) => <option key={u.Username} value={u.Full_Name}>{u.Full_Name}'s entries</option>)}
+          </select>
+        )}
       </div>
 
       <div className="grid grid-cols-4 gap-4">
