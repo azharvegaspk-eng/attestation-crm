@@ -14,6 +14,9 @@ export default function SettingsPage() {
   const [companyName, setCompanyName] = useState('');
   const [currency, setCurrency] = useState('');
   const [frontendUrl, setFrontendUrl] = useState('');
+  const [companyAddress, setCompanyAddress] = useState('');
+  const [companyPhone, setCompanyPhone] = useState('');
+  const [companyEmail, setCompanyEmail] = useState('');
   const [teamUsers, setTeamUsers] = useState([]);
   const [me, setMe] = useState(null);
   const [rates, setRates] = useState([]);
@@ -28,6 +31,9 @@ export default function SettingsPage() {
       setCompanyName(s.company_name || '');
       setCurrency(s.currency || '');
       setFrontendUrl(s.frontend_url || '');
+      setCompanyAddress(s.company_address || '');
+      setCompanyPhone(s.company_phone || '');
+      setCompanyEmail(s.company_email || '');
     }).catch((e) => toast.error(e.message));
     api.getUsers().then(setTeamUsers).catch(() => {});
     api.getServiceRates().then(setRates).catch(() => {});
@@ -50,7 +56,7 @@ export default function SettingsPage() {
 
   async function saveSettings() {
     try {
-      await api.updateSettings({ company_name: companyName, currency, frontend_url: frontendUrl });
+      await api.updateSettings({ company_name: companyName, currency, frontend_url: frontendUrl, company_address: companyAddress, company_phone: companyPhone, company_email: companyEmail });
       toast.success('Settings saved');
     }
     catch (e) { toast.error(e.message); }
@@ -85,6 +91,21 @@ export default function SettingsPage() {
           <input className="input" placeholder="https://your-crm.vercel.app" value={frontendUrl} onChange={(e) => setFrontendUrl(e.target.value)} />
           <p className="text-xs text-slate-400 mt-1">This is your deployed Vercel link. It's used to build the QR code/status link printed on client invoices — e.g. {frontendUrl || 'https://your-crm.vercel.app'}/status/CS-0001</p>
         </div>
+        <div>
+          <label className="label">Company Address</label>
+          <input className="input" placeholder="Head Office - Islamabad | Office No. ..." value={companyAddress} onChange={(e) => setCompanyAddress(e.target.value)} />
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="label">Company Phone</label>
+            <input className="input" placeholder="+92 3XX XXXXXXX" value={companyPhone} onChange={(e) => setCompanyPhone(e.target.value)} />
+          </div>
+          <div>
+            <label className="label">Company Email</label>
+            <input className="input" placeholder="info@avenzaconsultancy.pk" value={companyEmail} onChange={(e) => setCompanyEmail(e.target.value)} />
+          </div>
+        </div>
+        <p className="text-xs text-slate-400">These appear on every invoice, next to your logo.</p>
         <button className="btn-primary" onClick={saveSettings}>Save</button>
       </div>
 
